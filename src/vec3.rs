@@ -1,6 +1,9 @@
-use std::ops::{Add, Div, Mul, Neg};
+use std::{
+    ops::{Add, Div, Mul, Neg},
+    process::Output,
+};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
     e: [f64; 3],
 }
@@ -42,25 +45,47 @@ impl Neg for Vec3 {
     }
 }
 
-impl Mul for Vec3 {
+impl Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        todo!()
+        Self::new(
+            self.e[0] * rhs.e[0],
+            self.e[1] * rhs.e[1],
+            self.e[2] * rhs.e[2],
+        )
+    }
+}
+
+impl Mul<f64> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self::new(self.e[0] * rhs, self.e[1] * rhs, self.e[2] * rhs)
+    }
+}
+
+impl Mul<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3::new(rhs.x() * self, rhs.y() * self, rhs.z() * self)
     }
 }
 
 #[cfg(test)]
 mod test {
+    use std::vec;
+
     use super::*;
 
     #[test]
     fn test_new() {
         let actual: Vec3 = Vec3::new(1.0, 2.0, 3.0);
 
-        let expected: [f64; 3] = [1.0, 2.0, 3.0];
+        let expected = Vec3 { e: [1.0, 2.0, 3.0] };
 
-        assert!(actual.e == expected)
+        assert!(actual == expected);
     }
 
     #[test]
@@ -89,18 +114,23 @@ mod test {
         let lhs: Vec3 = Vec3::new(1.0, 2.0, 3.0);
         let rhs: Vec3 = Vec3::new(1.0, 2.0, 3.0);
 
-        let expected: [f64; 3] = [2.0, 4.0, 6.0];
+        let expected = Vec3 { e: [2.0, 4.0, 6.0] };
+
         let actual: Vec3 = lhs + rhs;
 
-        assert!(actual.e == expected)
+        assert!(actual == expected);
     }
 
     #[test]
     fn test_neg() {
         let subject = Vec3::new(1.0, 1.0, 1.0);
+        let expected = Vec3 {
+            e: [-1.0, -1.0, -1.0],
+        };
+
         let actual = -subject;
 
-        assert!([-1.0, -1.0, -1.0] == actual.e);
+        assert!(actual == expected);
     }
 
     #[test]
@@ -116,14 +146,40 @@ mod test {
     }
 
     #[test]
-    fn test_mul() {
+    fn test_mul_two_vec3() {
         let subject = Vec3::new(2.0, 3.0, 4.0);
         let right = Vec3::new(3.0, 4.0, 5.0);
 
-        let expected: [f64; 3] = [6.0, 12.0, 20.0];
+        let expected = Vec3 {
+            e: [6.0, 12.0, 20.0],
+        };
 
         let actual = subject * right;
 
-        assert!(actual.e == expected);
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn test_mul_vec3_f64() {
+        let vector = Vec3::new(1.0, 2.0, 3.0);
+        let float: f64 = 2.0;
+
+        let expected = Vec3 { e: [2.0, 4.0, 6.0] };
+
+        let actual = vector * float;
+
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn test_mul_f64_vec3() {
+        let vector = Vec3::new(1.0, 2.0, 3.0);
+        let float: f64 = 2.0;
+
+        let expected = Vec3 { e: [2.0, 4.0, 6.0] };
+
+        let actual = float * vector;
+
+        assert!(actual == expected);
     }
 }
