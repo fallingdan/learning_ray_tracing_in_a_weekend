@@ -1,4 +1,5 @@
 use indicatif::ProgressBar;
+mod color;
 mod vec3;
 
 fn main() {
