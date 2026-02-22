@@ -1,8 +1,10 @@
 use std::io;
 
 use indicatif::{ProgressBar, ProgressStyle};
+use vec3::Vec3;
 
 use crate::color::Color;
+use crate::ray::Ray;
 mod color;
 mod ray;
 mod vec3;
@@ -12,12 +14,20 @@ fn main() {
     let aspect_ratio: f64 = 16.0 / 9.0;
     let image_width: u32 = 400;
 
+    // Calculate image height and make sure its at least 1
     let image_height: u32 = (image_width as f64 / aspect_ratio) as u32;
     let image_height = if image_height < 1 { 1 } else { image_height };
 
+    // Camera
+    let focal_length: f64 = 1.0;
     let viewport_height: f64 = 2.0;
     let viewport_width: f64 =
         viewport_height * (image_width as f64 / image_height as f64);
+
+    // Calculate the vectors across the horizontal and down the vertical
+    // viewport edges
+    let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
+    let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
 
     // Render
     print!("P3\n{} {}\n255\n", image_width, image_height);
@@ -42,4 +52,8 @@ fn main() {
     }
 
     progress_bar.finish_with_message("\nDone\n");
+}
+
+fn ray_color(_ray: &Ray) -> Color {
+    Color::new(0.0, 0.0, 0.0)
 }
