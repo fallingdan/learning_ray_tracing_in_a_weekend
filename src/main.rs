@@ -9,14 +9,22 @@ mod vec3;
 
 fn main() {
     // Image
-    let image_width: u32 = 256;
-    let image_height: u32 = 256;
+    let aspect_ratio: f64 = 16.0 / 9.0;
+    let image_width: u32 = 400;
+
+    let image_height: u32 = (image_width as f64 / aspect_ratio) as u32;
+    let image_height = if image_height < 1 { 1 } else { image_height };
+
+    let viewport_height: f64 = 2.0;
+    let viewport_width: f64 =
+        viewport_height * (image_width as f64 / image_height as f64);
 
     // Render
     print!("P3\n{} {}\n255\n", image_width, image_height);
 
     let style = ProgressStyle::with_template("{msg}").unwrap();
-    let progress_bar: ProgressBar = ProgressBar::new(image_height.into()).with_style(style);
+    let progress_bar: ProgressBar =
+        ProgressBar::new(image_height.into()).with_style(style);
 
     let mut stdout = io::stdout();
 
