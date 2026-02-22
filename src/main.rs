@@ -70,6 +70,10 @@ fn main() {
     progress_bar.finish_with_message("\nDone\n");
 }
 
-fn ray_color(_ray: &Ray) -> Color {
-    Color::new(0.0, 0.0, 0.0)
+fn ray_color(ray: &Ray) -> Color {
+    let unit_direction = Vec3::unitvector(ray.direction());
+
+    let a = 0.5 * (unit_direction.y() + 1.0);
+
+    (1.0 - a) * Color::new(1.0, 1.0, 1.0) + a * Color::new(0.5, 0.7, 1.0)
 }
