@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
@@ -29,7 +29,9 @@ impl Vec3 {
     }
 
     pub fn length_squared(self) -> f64 {
-        (self.e[0] * self.e[0]) + (self.e[1] * self.e[1]) + (self.e[2] * self.e[2])
+        (self.e[0] * self.e[0])
+            + (self.e[1] * self.e[1])
+            + (self.e[2] * self.e[2])
     }
 
     pub fn dotproduct(u: &Vec3, v: &Vec3) -> f64 {
@@ -61,6 +63,20 @@ impl AddAssign<Vec3> for Vec3 {
         self.e[0] += rhs.e[0];
         self.e[1] += rhs.e[1];
         self.e[2] += rhs.e[2];
+    }
+}
+
+impl Sub<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            e: [
+                self.e[0] - rhs.e[0],
+                self.e[1] - rhs.e[1],
+                self.e[2] - rhs.e[2],
+            ],
+        }
     }
 }
 
@@ -228,6 +244,18 @@ mod test {
         let expected = Vec3::new(-4.0, 8.0, -4.0);
 
         let actual = Vec3::crossproduct(&lhs, &rhs);
+
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn test_sub() {
+        let lhs = Vec3::new(5.0, 4.0, 3.0);
+        let rhs = Vec3::new(4.0, 3.0, 6.0);
+
+        let expected = Vec3::new(1.0, 1.0, -3.0);
+
+        let actual = lhs - rhs;
 
         assert!(actual == expected);
     }
