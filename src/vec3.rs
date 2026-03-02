@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Vec3 {
     e: [f64; 3],
 }
@@ -76,6 +76,16 @@ impl Sub<Vec3> for Vec3 {
                 self.e[1] - rhs.e[1],
                 self.e[2] - rhs.e[2],
             ],
+        }
+    }
+}
+
+impl Sub<f64> for Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: f64) -> Self::Output {
+        Vec3 {
+            e: [self.e[0] - rhs, self.e[1] - rhs, self.e[2] - rhs],
         }
     }
 }
@@ -249,13 +259,25 @@ mod test {
     }
 
     #[test]
-    fn test_sub() {
+    fn test_sub_vec3() {
         let lhs = Vec3::new(5.0, 4.0, 3.0);
         let rhs = Vec3::new(4.0, 3.0, 6.0);
 
         let expected = Vec3::new(1.0, 1.0, -3.0);
 
         let actual = lhs - rhs;
+
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn test_sub_f64() {
+        let subject = Vec3::new(3.0, 2.0, 1.0);
+        let float: f64 = 2.0;
+
+        let expected = Vec3::new(1.0, 0.0, -1.0);
+
+        let actual = subject - float;
 
         assert!(actual == expected);
     }
