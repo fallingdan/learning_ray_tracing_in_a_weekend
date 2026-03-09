@@ -4,8 +4,12 @@ use indicatif::{ProgressBar, ProgressStyle};
 use vec3::{Point3, Vec3};
 
 use crate::color::Color;
+use crate::hittable::{HitRecord, Hittable};
+use crate::hittable_list::HittableList;
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 mod color;
+mod common;
 mod hittable;
 mod hittable_list;
 mod ray;
@@ -20,6 +24,11 @@ fn main() {
     // Calculate image height and make sure its at least 1
     let image_height: u32 = (image_width as f64 / aspect_ratio) as u32;
     let image_height = if image_height < 1 { 1 } else { image_height };
+
+    // world
+    let mut world: HittableList = HittableList::new();
+    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
 
     // Camera
     let focal_length: f64 = 1.0;
@@ -63,7 +72,7 @@ fn main() {
             let ray_direction = pixel_center - camera_center;
             let ray = Ray::new(camera_center, ray_direction);
 
-            let pixel_color = ray_color(&ray);
+            let pixel_color = ray_color(&ray, &world);
             color::write_color(&mut stdout, &pixel_color);
         }
         progress_bar.inc(1);
@@ -72,14 +81,10 @@ fn main() {
     progress_bar.finish_with_message("\nDone\n");
 }
 
-fn ray_color(ray: &Ray) -> Color {
-    let sphere = Point3::new(0.0, 0.0, -1.0);
-    let t = hit_sphere(&sphere, 0.5, ray);
-
-    if t > 0.0 {
-        let normal = (ray.at(t) - Vec3::new(0.0, 0.0, -1.0)).unitvector();
-        return 0.5
-            * Color::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
+fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
+    let mut rec = HitRecord::new();
+    if world.hit(ray, 0.0, common::INFINITY, &mut rec) {
+        return 0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0));
     }
 
     let unit_direction = Vec3::unitvector(ray.direction());
